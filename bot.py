@@ -38,17 +38,14 @@ files = glob.glob(ppath)
 TechVJBot.start()
 loop = asyncio.get_event_loop()
 
-# --- QEYBTA CUSUB EE AUTO-RESTART ---
-# Waxaan ku darnay function-kan si uu u nadiifiyo RAM-ka 24-kii saacba mar
-async def auto_restart():
-    while True:
-        await asyncio.sleep(86400) # 86400 ilbiriqsi = 24 saacadood
-        logging.info("Waqtigii dayactirka: Bot-ka waa la Restart-gareynayaa si RAM-ka loo nadiifiyo...")
-        try:
-            os.execl(sys.executable, sys.executable, *sys.argv)
-        except Exception as e:
-            logging.error(f"Khalad ayaa dhacay restart-ga: {e}")
-# ------------------------------------
+# --- NEW AUTO RESTART FUNCTION (6 Hours) ---
+async def auto_restart_worker():
+    print("✅ Auto Restart Worker Started: Bot will restart every 6 hours.")
+    # 21600 seconds = 6 Hours
+    await asyncio.sleep(21600)
+    print("♻️ 6 Hours Passed. Restarting Bot now to clean memory...")
+    os.execl(sys.executable, sys.executable, *sys.argv)
+# -------------------------------------------
 
 async def start():
     print('\n')
@@ -83,9 +80,9 @@ async def start():
     bind_address = "0.0.0.0"
     await web.TCPSite(app, bind_address, PORT).start()
     
-    # --- HERE: Start the Auto-Restart Task ---
-    asyncio.create_task(auto_restart())
-    # -----------------------------------------
+    # --- START THE RESTART TIMER ---
+    asyncio.create_task(auto_restart_worker())
+    # -------------------------------
     
     await idle()
 
@@ -95,4 +92,3 @@ if __name__ == '__main__':
         loop.run_until_complete(start())
     except KeyboardInterrupt:
         logging.info('Service Stopped Bye 👋')
-
